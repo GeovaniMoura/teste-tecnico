@@ -42,7 +42,7 @@
 				<div class="container-selects">
 					<div class="container-select-estado">
 						<label htmlFor="select-estado">Estado*</label>
-						<select id="select-estado">
+						<select @change="({ target }) => getCitys(target)" id="select-estado">
 							<option value="" disabled selected>Selecione</option>
 							<option v-for="state in states" :key="state.id">
 								{{ state.sigla }}
@@ -53,7 +53,9 @@
 						<label htmlFor="select-cidade">Cidade*</label>
 						<select id="select-cidade">
 							<option value="" disabled selected>Selecione</option>
-							<option>First</option>
+							<option v-for="city in citys" :key="city.id">
+                {{ city.nome }}
+              </option>
 						</select>
 					</div>
 				</div>
@@ -111,7 +113,6 @@ export default {
 					'https://api-teste-front-end-fc.herokuapp.com/profissionais'
 				);
 				const data = await req.json();
-        console.log(data);
 				return data;
 			} catch (error) {
 				console.log('Ocorreu um erro com a requisição');
@@ -125,6 +126,19 @@ export default {
 				);
 				const data = await req.json();
 				this.states = data;
+			} catch (error) {
+				console.log('Ocorreu um erro com a requisição');
+				this.errors.push(error);
+			}
+		},
+    async getCitys(target) {
+      try {
+        const selectedState = this.states.find((item) => item.sigla === target.value);
+				const req = await fetch(
+					`https://api-teste-front-end-fc.herokuapp.com/estados/${selectedState.id}/cidades`
+				);
+				const data = await req.json();
+        this.citys = data;
 			} catch (error) {
 				console.log('Ocorreu um erro com a requisição');
 				this.errors.push(error);
@@ -168,7 +182,6 @@ export default {
 		},
 	},
 	mounted() {
-    // this.getCitys();
 		this.getStates();
 	},
 };
