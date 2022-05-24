@@ -13,7 +13,7 @@
             name="nome-completo"
             placeholder="Digite o nome completo"
           >
-          <span style="color: red">{{ errorFullName }}</span>
+          <span style="color: #DC3545">{{ errorFullName }}</span>
         </div>
         <div class="container-inputs container-input-cpf">
           <label htmlFor="cpf">CPF*</label>
@@ -24,7 +24,7 @@
             name="cpf"
             placeholder="Digite um CPF"
           >
-          <span style="color: red">{{ errorCpf }}</span>
+          <span style="color: #DC3545">{{ errorCpf }}</span>
         </div>
         <div class="container-inputs container-input-phone-number">
           <label htmlFor="numero-celular">Número de celular*</label>
@@ -37,15 +37,15 @@
             maxlength="11"
             placeholder="(00) 0 0000-0000"
           >
-          <span style="color: red">{{ errorPhoneNumber }}</span>
+          <span style="color: #DC3545">{{ errorPhoneNumber }}</span>
         </div>
         <div class="container-selects">
           <div class="container-select-estado">
             <label htmlFor="select-estado">Estado*</label>
             <select
               id="select-estado"
-              required
-              @change="({ target }) => getCitys(target)"
+              v-model="selectedState"
+              @change="async ({ target }) => await getCitys(target)"
             >
               <option
                 value=""
@@ -61,12 +61,13 @@
                 {{ state.sigla }}
               </option>
             </select>
+            <span style="color: #DC3545">{{ errorState }}</span>
           </div>
           <div class="container-select-cidade">
             <label htmlFor="select-cidade">Cidade*</label>
             <select
               id="select-cidade"
-              required
+              v-model="selectedCity"
             >
               <option
                 value=""
@@ -82,6 +83,7 @@
                 {{ city.nome }}
               </option>
             </select>
+            <span style="color: #DC3545">{{ errorCity }}</span>
           </div>
         </div>
         <div class="container-progress-bar">
@@ -113,7 +115,11 @@ export default {
 			phoneNumber: '',
 			errorPhoneNumber: '',
 			states: [],
+			selectedState: '',
+			errorState: '',
 			citys: [],
+			selectedCity: '',
+			errorCity: '',
 			errors: [],
 		};
 	},
@@ -204,11 +210,29 @@ export default {
 				this.errorPhoneNumber = '';
 			}
 		},
+		validateState() {
+			if (!this.selectedState.length > 0) {
+				this.errorState = 'Selecione um estado';
+				this.errors.push('Selecione um estado');
+			} else {
+				this.errorState = '';
+			}
+		},
+		validateCity() {
+			if (!this.selectedCity.length > 0) {
+				this.errorCity = 'Selecione uma cidade';
+				this.errors.push('Selecione uma cidade');
+			} else {
+				this.errorCity = '';
+			}
+		},
 		checkForm(event) {
 			this.validateFullName();
 			this.validateCpf();
 			this.validatePhoneNumber();
 			this.getCpfs();
+			this.validateState();
+			this.validateCity();
 			if (!this.errors.length > 0) {
 				return true;
 			}
@@ -219,6 +243,7 @@ export default {
 </script>
 
 <style scoped>
+/* Estilizado na resolução 300 x 640 */
 * {
 	margin: 0;
 	padding: 0;
@@ -242,11 +267,12 @@ export default {
 	justify-content: flex-start;
 	border-radius: 30px 30px 0 0;
 	padding: 20px;
-	padding-top: 30px;
+	padding-top: 20px;
 	width: 100%;
-	height: 90%;
-	margin: 0 auto;
-	padding-bottom: 30px;
+	height: 95%;
+	margin: auto;
+	margin-bottom: 0;
+	padding-bottom: 0px;
 }
 
 .container-main h1 {
@@ -269,7 +295,7 @@ export default {
 
 .container-inputs input {
 	border-radius: 7px;
-	border: 2px solid rgb(71, 53, 151);
+	border: 2px solid rgb(72, 54, 152);
 	padding: 5px;
 	padding-left: 30px;
 	margin: 5px 0 0 0;
@@ -278,7 +304,7 @@ export default {
 }
 
 .container-inputs span {
-	margin-bottom: 10px;
+	margin-bottom: 8px;
 	font-size: 80%;
 }
 
@@ -301,7 +327,7 @@ export default {
 
 .container-selects select {
 	margin-top: 5px;
-	border: 2px solid rgb(71, 53, 151);
+	border: 2px solid rgb(72, 54, 152);
 	border-radius: 7px;
 	background-color: white;
 	color: #959595;
@@ -312,6 +338,10 @@ export default {
 	display: flex;
 	flex-flow: column nowrap;
 	width: 45%;
+}
+
+.container-select-estado span, .container-select-cidade span {
+	font-size: 80%;
 }
 
 .container-select-cidade {
@@ -343,7 +373,7 @@ export default {
 
 .container-progress-bar span {
 	width: 20%;
-	color: rgb(40, 13, 148);
+	color: rgb(72, 54, 152);
 	right: 0;
 	position: absolute;
 	font-size: 100%;
