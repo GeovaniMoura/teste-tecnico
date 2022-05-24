@@ -76,10 +76,23 @@ export default {
 			errorCpf: '',
 			phoneNumber: '',
 			errorPhoneNumber: '',
-			cpfsCadastrados: null,
 			errors: [],
 		};
 	},
+  watch: {
+    cpf: async function () {
+      if (this.cpf.substring(3, 4) !== '.' || this.cpf.substring(6, 7) !== '.' || this.cpf.substring(11,12) !== '-') {
+        this.cpf = cpf.format(this.cpf);
+      }
+      if (this.cpf.length === 14) {
+        const data = await this.getCpfs()
+        const find = data.find((item) => cpf.format(item.cpf) === this.cpf)
+        if (find) {
+          this.errorCpf = 'CPF já cadastrado';
+        }
+      }
+    }
+  },
 	methods: {
 		async getCpfs() {
 			const req = await fetch(
@@ -89,20 +102,17 @@ export default {
 				}
 			);
 			const data = await req.json();
-			this.cpfsCadastrados = data;
+      return data;
 		},
 		validateFullName() {
 			if (this.fullName.length < 3 || this.fullName.length > 48) {
-				this.errorFullName = 'O número de caracteres deve ser de 3 a 48';
-				this.errors.push('O número de caracteres deve ser de 3 a 48');
+				this.errorFullName = 'Insira de 3 a 48 caracteres';
+				this.errors.push('Insira de 3 a 48 caracteres');
 			} else {
 				this.errorFullName = '';
 			}
 		},
 		validateCpf() {
-			// fetch('https://api-teste-front-end-fc.herokuapp.com').then(async res => {
-			//   console.log(res);
-			// });
 			if (!cpf.isValid(cpf.format(this.cpf))) {
 				this.errorCpf = 'CPF inválido';
 				this.errors.push('CPF inválido');
@@ -125,7 +135,7 @@ export default {
 		},
 	},
 	mounted() {
-		this.getCpfs();
+		// this.getCpfs();
 	},
 };
 </script>
@@ -157,7 +167,7 @@ export default {
     padding: 20px;
     padding-top: 30px;
     width: 100%;
-    height: 91%;
+    height: 95%;
     margin: 0 auto;
     padding-bottom: 30px;
   }
@@ -185,9 +195,13 @@ export default {
     border: 2px solid rgb(71, 53, 151);
     padding: 7px;
     padding-left: 30px;
-    margin: 5px 0 20px 0;
+    margin: 5px 0 0 0;
     color: #959595;
     width: 100%;
+  }
+
+  .container-inputs span {
+    margin-bottom: 10px;
   }
 
   .container-input-cpf {
