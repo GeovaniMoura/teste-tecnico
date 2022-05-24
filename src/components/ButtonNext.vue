@@ -1,6 +1,8 @@
 <template>
   <div>
-    <button type="submit">PŔOXIMO</button>
+    <button type="submit">
+      PŔOXIMO
+    </button>
   </div>
 </template>
 

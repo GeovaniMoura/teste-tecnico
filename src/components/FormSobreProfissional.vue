@@ -1,76 +1,97 @@
 <template>
-	<div class="container">
-		<div class="container-main">
-			<h1>Sobre o profissional</h1>
-			<h2>Dados do profissional</h2>
-			<form @submit="checkForm">
-				<div class="container-inputs">
-					<label htmlFor="nome-completo">Nome Completo*</label>
-					<input
-						type="text"
-						id="nome-completo"
-						name="nome-completo"
-						v-model="fullName"
-						placeholder="Digite o nome completo"
-					/>
-					<span style="color: red">{{ errorFullName }}</span>
-				</div>
-				<div class="container-inputs container-input-cpf">
-					<label htmlFor="cpf">CPF*</label>
-					<input
-						type="text"
-						id="cpf"
-						name="cpf"
-						v-model="cpf"
-						placeholder="Digite um CPF"
-					/>
-					<span style="color: red">{{ errorCpf }}</span>
-				</div>
-				<div class="container-inputs container-input-phone-number">
-					<label htmlFor="numero-celular">Número de celular*</label>
-					<input
-						type="text"
-						id="numero-celular"
-						name="numero-celular"
-						oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');"
-						maxlength="11"
-						v-model="phoneNumber"
-						placeholder="(00) 0 0000-0000"
-					/>
-					<span style="color: red">{{ errorPhoneNumber }}</span>
-				</div>
-				<div class="container-selects">
-					<div class="container-select-estado">
-						<label htmlFor="select-estado">Estado*</label>
-						<select
-							@change="({ target }) => getCitys(target)"
-							id="select-estado"
-							required
-						>
-							<option value="" disabled selected>Selecione</option>
-							<option v-for="state in states" :key="state.id">
-								{{ state.sigla }}
-							</option>
-						</select>
-					</div>
-					<div class="container-select-cidade">
-						<label htmlFor="select-cidade">Cidade*</label>
-						<select id="select-cidade" required>
-							<option value="" disabled selected>Selecione</option>
-							<option v-for="city in citys" :key="city.id">
-								{{ city.nome }}
-							</option>
-						</select>
-					</div>
-				</div>
-				<div class="container-progress-bar">
-					<div class="progress-bar"></div>
-					<span>1 de 2</span>
-				</div>
-				<ButtonNext />
-			</form>
-		</div>
-	</div>
+  <div class="container">
+    <div class="container-main">
+      <h1>Sobre o profissional</h1>
+      <h2>Dados do profissional</h2>
+      <form @submit="checkForm">
+        <div class="container-inputs">
+          <label htmlFor="nome-completo">Nome Completo*</label>
+          <input
+            id="nome-completo"
+            v-model="fullName"
+            type="text"
+            name="nome-completo"
+            placeholder="Digite o nome completo"
+          >
+          <span style="color: red">{{ errorFullName }}</span>
+        </div>
+        <div class="container-inputs container-input-cpf">
+          <label htmlFor="cpf">CPF*</label>
+          <input
+            id="cpf"
+            v-model="cpf"
+            type="text"
+            name="cpf"
+            placeholder="Digite um CPF"
+          >
+          <span style="color: red">{{ errorCpf }}</span>
+        </div>
+        <div class="container-inputs container-input-phone-number">
+          <label htmlFor="numero-celular">Número de celular*</label>
+          <input
+            id="numero-celular"
+            v-model="phoneNumber"
+            type="text"
+            name="numero-celular"
+            oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');"
+            maxlength="11"
+            placeholder="(00) 0 0000-0000"
+          >
+          <span style="color: red">{{ errorPhoneNumber }}</span>
+        </div>
+        <div class="container-selects">
+          <div class="container-select-estado">
+            <label htmlFor="select-estado">Estado*</label>
+            <select
+              id="select-estado"
+              required
+              @change="({ target }) => getCitys(target)"
+            >
+              <option
+                value=""
+                disabled
+                selected
+              >
+                Selecione
+              </option>
+              <option
+                v-for="state in states"
+                :key="state.id"
+              >
+                {{ state.sigla }}
+              </option>
+            </select>
+          </div>
+          <div class="container-select-cidade">
+            <label htmlFor="select-cidade">Cidade*</label>
+            <select
+              id="select-cidade"
+              required
+            >
+              <option
+                value=""
+                disabled
+                selected
+              >
+                Selecione
+              </option>
+              <option
+                v-for="city in citys"
+                :key="city.id"
+              >
+                {{ city.nome }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="container-progress-bar">
+          <div class="progress-bar" />
+          <span>1 de 2</span>
+        </div>
+        <ButtonNext />
+      </form>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -80,6 +101,9 @@ const parse = require('telefone/parse');
 
 export default {
 	name: 'FormSobreProfissional',
+  components: {
+    ButtonNext,
+  },
 	data() {
 		return {
 			fullName: '',
@@ -111,45 +135,48 @@ export default {
 			}
 		},
 	},
+	mounted() {
+		this.getStates();
+	},
 	methods: {
 		async getCpfs() {
-			try {
-				const req = await fetch(
-					'https://api-teste-front-end-fc.herokuapp.com/profissionais'
-				);
-				const data = await req.json();
-				return data;
-			} catch (error) {
-				console.log('Ocorreu um erro com a requisição');
-				this.errors.push(error);
-			}
+			const req = await fetch(
+				'https://api-teste-front-end-fc.herokuapp.com/profissionais'
+			);
+			if (req.status === 404) {
+				let errorResponse = req.json();
+				this.errors.push(errorResponse.error);
+				return console.log('Not Found');
+			} 
+			const data = await req.json();
+			return data;
 		},
 		async getStates() {
-			try {
-				const req = await fetch(
-					'https://api-teste-front-end-fc.herokuapp.com/estados'
-				);
-				const data = await req.json();
-				this.states = data;
-			} catch (error) {
-				console.log('Ocorreu um erro com a requisição');
-				this.errors.push(error);
-			}
+			const req = await fetch(
+				'https://api-teste-front-end-fc.herokuapp.com/estados'
+			);
+			if (req.status === 404) {
+				let errorResponse = req.json();
+				this.errors.push(errorResponse.error);
+				return console.log('Not Found');
+			} 
+			const data = await req.json();
+			this.states = data;
 		},
 		async getCitys(target) {
-			try {
 				const selectedState = this.states.find(
 					(item) => item.sigla === target.value
 				);
 				const req = await fetch(
 					`https://api-teste-front-end-fc.herokuapp.com/estados/${selectedState.id}/cidades`
 				);
+				if (req.status === 404) {
+					let errorResponse = req.json();
+					this.errors.push(errorResponse.error);
+					return console.log('Not Found');
+				}
 				const data = await req.json();
 				this.citys = data;
-			} catch (error) {
-				console.log('Ocorreu um erro com a requisição');
-				this.errors.push(error);
-			}
 		},
 		validateFullName() {
 			if (this.fullName.length < 3 || this.fullName.length > 48) {
@@ -188,12 +215,6 @@ export default {
 			event.preventDefault();
 		},
 	},
-	mounted() {
-		this.getStates();
-	},
-  components: {
-    ButtonNext,
-  },
 };
 </script>
 
@@ -223,7 +244,7 @@ export default {
 	padding: 20px;
 	padding-top: 30px;
 	width: 100%;
-	height: 95%;
+	height: 90%;
 	margin: 0 auto;
 	padding-bottom: 30px;
 }

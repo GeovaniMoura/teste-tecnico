@@ -1,16 +1,7 @@
 <template>
-	<div>
-		<FormSobreProfissional />
-	</div>
+  <router-view />
 </template>
 
-<script>
-import FormSobreProfissional from './components/FormSobreProfissional.vue';
+<style>
 
-export default {
-	name: 'App',
-	components: {
-		FormSobreProfissional,
-	},
-};
-</script>
+</style>
