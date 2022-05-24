@@ -42,7 +42,11 @@
 				<div class="container-selects">
 					<div class="container-select-estado">
 						<label htmlFor="select-estado">Estado*</label>
-						<select @change="({ target }) => getCitys(target)" id="select-estado">
+						<select
+							@change="({ target }) => getCitys(target)"
+							id="select-estado"
+							required
+						>
 							<option value="" disabled selected>Selecione</option>
 							<option v-for="state in states" :key="state.id">
 								{{ state.sigla }}
@@ -51,11 +55,11 @@
 					</div>
 					<div class="container-select-cidade">
 						<label htmlFor="select-cidade">Cidade*</label>
-						<select id="select-cidade">
+						<select id="select-cidade" required>
 							<option value="" disabled selected>Selecione</option>
 							<option v-for="city in citys" :key="city.id">
-                {{ city.nome }}
-              </option>
+								{{ city.nome }}
+							</option>
 						</select>
 					</div>
 				</div>
@@ -63,13 +67,14 @@
 					<div class="progress-bar"></div>
 					<span>1 de 2</span>
 				</div>
-				<button type="submit">PRÓXIMO</button>
+				<ButtonNext />
 			</form>
 		</div>
 	</div>
 </template>
 
 <script>
+import ButtonNext from './ButtonNext.vue'
 import { cpf } from 'cpf-cnpj-validator';
 const parse = require('telefone/parse');
 
@@ -84,7 +89,7 @@ export default {
 			phoneNumber: '',
 			errorPhoneNumber: '',
 			states: [],
-      citys: [],
+			citys: [],
 			errors: [],
 		};
 	},
@@ -131,14 +136,16 @@ export default {
 				this.errors.push(error);
 			}
 		},
-    async getCitys(target) {
-      try {
-        const selectedState = this.states.find((item) => item.sigla === target.value);
+		async getCitys(target) {
+			try {
+				const selectedState = this.states.find(
+					(item) => item.sigla === target.value
+				);
 				const req = await fetch(
 					`https://api-teste-front-end-fc.herokuapp.com/estados/${selectedState.id}/cidades`
 				);
 				const data = await req.json();
-        this.citys = data;
+				this.citys = data;
 			} catch (error) {
 				console.log('Ocorreu um erro com a requisição');
 				this.errors.push(error);
@@ -184,6 +191,9 @@ export default {
 	mounted() {
 		this.getStates();
 	},
+  components: {
+    ButtonNext,
+  },
 };
 </script>
 
@@ -287,12 +297,6 @@ export default {
 	display: flex;
 	flex-flow: column nowrap;
 	width: 45%;
-}
-
-.container button {
-	width: 100%;
-	border-radius: 20px;
-	background-color: rgb(72, 54, 152);
 }
 
 .container-progress-bar {

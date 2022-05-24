@@ -1,16 +1,16 @@
 <template>
-  <div>  
-    <FormSobreProfissional />
-  </div>
+	<div>
+		<FormSobreProfissional />
+	</div>
 </template>
 
 <script>
-  import FormSobreProfissional from './components/FormSobreProfissional.vue'
+import FormSobreProfissional from './components/FormSobreProfissional.vue';
 
-  export default {
-    name: 'App',
-    components: {
-      FormSobreProfissional,
-    }
-  }
+export default {
+	name: 'App',
+	components: {
+		FormSobreProfissional,
+	},
+};
 </script>
