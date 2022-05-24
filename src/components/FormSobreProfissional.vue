@@ -32,6 +32,8 @@
               type="text"
               id="numero-celular"
               name="numero-celular"
+              oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');"
+              maxlength="11"
               v-model="phoneNumber"
               placeholder="(00) 0 0000-0000"
             />
@@ -65,6 +67,7 @@
 
 <script>
 import { cpf } from 'cpf-cnpj-validator';
+const parse = require('telefone/parse');
 
 export default {
 	name: 'FormSobreProfissional',
@@ -91,7 +94,7 @@ export default {
           this.errorCpf = 'CPF já cadastrado';
         }
       }
-    }
+    },
   },
 	methods: {
 		async getCpfs() {
@@ -121,7 +124,14 @@ export default {
 			}
 		},
 		validatePhoneNumber() {
-			console.log('oi');
+			const validPhone = parse(this.phoneNumber, { apenasCelular: true });
+
+      if (!validPhone) {
+        this.errorPhoneNumber = 'Número de celular inválido';
+        this.errors.push('Número de celular inválido');
+      } else {
+        this.errorPhoneNumber = '';
+      }
 		},
 		checkForm(event) {
 			this.validateFullName();
@@ -193,7 +203,7 @@ export default {
   .container-inputs input {
     border-radius: 7px;
     border: 2px solid rgb(71, 53, 151);
-    padding: 7px;
+    padding: 5px;
     padding-left: 30px;
     margin: 5px 0 0 0;
     color: #959595;
@@ -202,6 +212,7 @@ export default {
 
   .container-inputs span {
     margin-bottom: 10px;
+    font-size: 80%;
   }
 
   .container-input-cpf {
@@ -227,7 +238,7 @@ export default {
     border-radius: 7px;
     background-color: white;
     color: #959595;
-    padding: 7px;
+    padding: 5px;
   }
 
   .container-select-estado {
