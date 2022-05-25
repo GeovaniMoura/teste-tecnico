@@ -3,7 +3,7 @@
     <div class="container-main">
       <h1>Sobre o profissional</h1>
       <h2>Dados do profissional</h2>
-      <form @submit="checkForm">
+      <form>
         <div class="container-inputs">
           <label htmlFor="nome-completo">Nome Completo*</label>
           <input
@@ -90,7 +90,10 @@
           <div class="progress-bar" />
           <span>1 de 2</span>
         </div>
-        <ButtonNext />
+        <ButtonNext
+          url="/sobreatendimento"
+          :check-form-is-valid="checkFormIsValid"
+        />
       </form>
     </div>
   </div>
@@ -226,17 +229,17 @@ export default {
 				this.errorCity = '';
 			}
 		},
-		checkForm(event) {
+		async checkFormIsValid() {
 			this.validateFullName();
 			this.validateCpf();
 			this.validatePhoneNumber();
-			this.getCpfs();
+			await this.getCpfs();
 			this.validateState();
 			this.validateCity();
 			if (!this.errors.length > 0) {
-				return true;
+				return this.validForm = true;
 			}
-			event.preventDefault();
+			this.errors = [];
 		},
 	},
 };
