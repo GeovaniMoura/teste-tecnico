@@ -256,23 +256,20 @@ export default {
 .container {
 	background-color: #ffe766;
 	height: 100vh;
-	width: 100vw;
+	min-width: 100vw;
 	display: flex;
-	justify-content: center;
-	flex-wrap: nowrap;
-	align-items: flex-end;
 }
 
 .container-main {
 	background-color: white;
 	display: flex;
-	flex-flow: column wrap;
+	flex-flow: column nowrap;
 	justify-content: flex-start;
 	border-radius: 30px 30px 0 0;
 	padding: 20px;
 	padding-top: 20px;
 	width: 100%;
-	height: 95%;
+	height: 90%;
 	margin: auto;
 	margin-bottom: 0;
 	padding-bottom: 0px;
