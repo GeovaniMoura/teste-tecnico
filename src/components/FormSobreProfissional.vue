@@ -57,6 +57,7 @@
               <option
                 v-for="state in states"
                 :key="state.id"
+                value="{{ state.sigla }}"
               >
                 {{ state.sigla }}
               </option>
@@ -79,6 +80,7 @@
               <option
                 v-for="city in citys"
                 :key="city.id"
+                value="{{city.nome}}"
               >
                 {{ city.nome }}
               </option>
@@ -153,7 +155,7 @@ export default {
 				'https://api-teste-front-end-fc.herokuapp.com/profissionais'
 			);
 			if (req.status === 404) {
-				let errorResponse = req.json();
+				let errorResponse = await req.json();
 				this.errors.push(errorResponse.error);
 				return console.log('Not Found');
 			} 
@@ -165,7 +167,7 @@ export default {
 				'https://api-teste-front-end-fc.herokuapp.com/estados'
 			);
 			if (req.status === 404) {
-				let errorResponse = req.json();
+				let errorResponse = await req.json();
 				this.errors.push(errorResponse.error);
 				return console.log('Not Found');
 			} 
@@ -180,7 +182,7 @@ export default {
 					`https://api-teste-front-end-fc.herokuapp.com/estados/${selectedState.id}/cidades`
 				);
 				if (req.status === 404) {
-					let errorResponse = req.json();
+					let errorResponse = await req.json();
 					this.errors.push(errorResponse.error);
 					return console.log('Not Found');
 				}

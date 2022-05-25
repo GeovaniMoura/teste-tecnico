@@ -22,6 +22,13 @@
           >
             Selecione a especialidade
           </option>
+          <option
+            v-for="specialty in mainSpecialtys"
+            :key="specialty.id"
+            value="{{specialty.nome}}"
+          >
+            {{ specialty.nome }}
+          </option>
         </select>
       </form>
     </div>
@@ -33,9 +40,27 @@ export default {
   name: 'FormSobreAtendimento',
   data() {
     return {
+      mainSpecialtys: [],
       selectedMainSpecialty: '',
     }
   },
+  mounted() {
+    this.getSpecialty();
+  },
+  methods: {
+    async getSpecialty() {
+      const req = await fetch(
+        'https://api-teste-front-end-fc.herokuapp.com/especialidade'
+      );
+      if (req.status === 404) {
+				let errorResponse = await req.json();
+				this.errors.push(errorResponse.error);
+				return console.log('Not Found');
+			} 
+			const data = await req.json();
+      this.mainSpecialtys = data;
+    }
+  }
 }
 </script>
 
@@ -61,16 +86,20 @@ export default {
   height: 88%;
   margin: auto;
   margin-bottom: 0;
+  width: 100%;
   display: flex;
   align-items: center;
   border-radius: 30px 30px 0 0;
-  flex-direction: column;
+  flex-flow: column nowrap;
+  justify-content: flex-start;
+  padding: 20px;
+	padding-top: 20px;
+  padding-bottom: 0px;
 }
 
 .container-back-page {
   margin: auto;
   margin-left: 15px;
-  width: 100%;
   height: 10%;
   align-items: center;
   display: flex;
