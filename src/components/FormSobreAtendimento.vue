@@ -50,7 +50,7 @@ export default {
   methods: {
     async getSpecialty() {
       const req = await fetch(
-        'https://api-teste-front-end-fc.herokuapp.com/especialidade'
+        'https://api-teste-front-end-fc.herokuapp.com/especialidades'
       );
       if (req.status === 404) {
 				let errorResponse = await req.json();
