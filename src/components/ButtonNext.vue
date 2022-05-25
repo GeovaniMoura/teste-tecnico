@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div class="button-submit">
     <button type="submit">
-      PŔOXIMO
+      PRÓXIMO
     </button>
   </div>
 </template>
@@ -18,5 +18,7 @@ button {
 	border-radius: 20px;
 	background-color: rgb(72, 54, 152);
   border: none;
+  padding: 5px;
+  color: white;
 }
 </style>
