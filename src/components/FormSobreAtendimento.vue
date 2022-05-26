@@ -8,10 +8,9 @@
     <div class="container-main">
       <h1>Sobre o atendimento</h1>
       <h2>Detalhes do atendimento</h2>
-    
       <form>
         <div class="container-select-main-specialty">
-          <label htmlfor="select-main-specialty">Especialidade principal*</label>
+          <label for="select-main-specialty">Especialidade principal*</label>
           <select
             id="select-main-specialty"
             v-model="selectedMainSpecialty"
@@ -33,10 +32,12 @@
           </select>
           <span>{{ errorMainSpecialty }}</span>
         </div>
-        <div class="container-input-consultation-price">
-          <label>Informe o preço da consulta*</label>
-          <label htmlFor="input-consultation-price">
-            R$
+        <label>Informe o preço da consulta*</label>
+        <div class="container-consultation-price">
+          <div class="container-input-consultation-price">
+            <label htmlFor="input-consultation-price">
+              R$
+            </label>
             <input
               id="input-consultation-price"
               v-model="consultationPrice"
@@ -45,11 +46,11 @@
               max="350"
               placeholder="Valor"
             >
-          </label>
+          </div>
           <span>{{ errorConsultationPrice }}</span>
         </div>
+        <label id="legends-payment-methods">Formas de pagamento da consulta*</label>
         <div class="container-checkbox-payment-methods">
-          <p>Formas de pagamento da consulta*</p>
           <label htmlFor="checkbox-cash">
             <input
               id="checkbox-cash"
@@ -64,25 +65,77 @@
             >
             Pix
           </label>
-          <label htmlFor="checkbox-card">
-            <input
-              id="checkbox-card"
-              type="checkbox"
-            >
-            Cartão de crédito
-          </label>
+          <div>
+            <label htmlFor="checkbox-card">
+              <input
+                id="checkbox-card"
+                v-model="valueCheckboxCard"
+                type="checkbox"
+                @change="() => selectedInstallmentOption = ''"
+              >
+              Cartão de crédito
+              <div
+                v-if="valueCheckboxCard"
+                class="conteiner-installment-options"
+              >
+                <div>
+                  <label>Parcelamento em</label>
+                </div>
+                <div>
+                  <label>
+                    <input
+                      v-model="selectedInstallmentOption"
+                      value="1x, sem juros"
+                      type="radio"
+                      name="installment"
+                    >
+                    1x, sem juros
+                  </label>
+                  <label>
+                    <input
+                      v-model="selectedInstallmentOption"
+                      value="2x, sem juros"
+                      type="radio"
+                      name="installment"
+                    >
+                    2x, sem juros
+                  </label>
+                  <label>
+                    <input
+                      v-model="selectedInstallmentOption"
+                      value="3x, sem juros"
+                      type="radio"
+                      name="installment"
+                    >
+                    3x, sem juros
+                  </label>
+                </div>
+              </div>
+            </label>
+          </div>
+          <span>{{ errorMainSpecialty }}</span>
         </div>
-        <button @click="formIsValid">
-          Teste
-        </button>
+        <div class="container-progress-bar">
+          <div class="progress-bar" />
+          <span>2 de 2</span>
+        </div>
+        <ButtonNext
+          url="/sobre"
+          :check-form-is-valid="checkFormIsValid"
+        />
       </form>
     </div>
   </div>
 </template>
 
 <script>
+import ButtonNext from './ButtonNext.vue';
+
 export default {
   name: 'FormSobreAtendimento',
+  components: {
+    ButtonNext
+  },
   data() {
     return {
       mainSpecialtys: [],
@@ -90,6 +143,9 @@ export default {
       errorMainSpecialty: '',
       consultationPrice: '',
       errorConsultationPrice: '',
+      selectedPaymentMethods: [],
+      valueCheckboxCard: false,
+      selectedInstallmentOption: '',
       errors: [],
     }
   },
@@ -100,7 +156,7 @@ export default {
       } else {
         this.errorConsultationPrice = '';
       }
-    }
+    },
   },
   mounted() {
     this.getSpecialty();
@@ -134,8 +190,7 @@ export default {
         this.errorConsultationPrice = '';
       }
     },
-    formIsValid(event) {
-      event.preventDefault();
+    checkFormIsValid() {
       this.validateMainSpecialty();
       this.validateConsultationPrice();
       if (!this.errors.length > 0) {
@@ -155,6 +210,18 @@ export default {
   box-sizing: border-box;
 }
 
+label {
+  margin: 5px;
+  font-size: 90%
+}
+
+
+span {
+  color: #DC3545;
+  margin: 5px;
+  font-size: 90%;
+}
+
 .container {
   background-color: rgb(255, 231, 102);
   height: 100vh;
@@ -166,7 +233,7 @@ export default {
 
 .container-main {
   background-color: white;
-  height: 88%;
+  height: 95%;
   margin: auto;
   margin-bottom: 0;
   width: 100%;
@@ -200,12 +267,46 @@ export default {
   justify-content: flex-start;
 }
 
-.container-select-main-specialty span {
-  color: #DC3545;
+.container-select-main-specialty {
+  display: flex;
+  flex-flow: column nowrap;
 }
 
-.container-input-consultation-price span {
-  color: #DC3545;
+.container-select-main-specialty select {
+	margin-top: 5px;
+	border: 2px solid rgb(72, 54, 152);
+	border-radius: 7px;
+	background-color: white;
+	color: #959595;
+	padding: 8px;
+  width: 100%;
+}
+
+.container-consultation-price {
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.container-input-consultation-price {
+  display: flex;
+  border: 2px solid rgb(72, 54, 152);
+  border-radius: 7px;
+}
+
+.container-input-consultation-price label {
+  margin: 0;
+  padding: 6px;
+  background-color: rgb(72, 54, 152);
+  width: 15%;
+  font-size: 100%
+}
+
+.container-input-consultation-price input {
+  border-radius: 7px;
+  width: 85%;
+  padding: 6px;
+  padding-left: 7px;
+  border: none;
 }
 
 .container-checkbox-payment-methods {
@@ -216,7 +317,73 @@ export default {
 .container-checkbox-payment-methods label {
   border-radius: 10px;
   padding: 12px;
+  padding-left: 20px;
   margin: 10px;
+  margin-left: 0;
+  margin-bottom: 15px;
   box-shadow: 0 0.8px 0.8px 0.8px #b9b9b9;
+  width: 100%;
+}
+
+.container-checkbox-payment-methods input {
+  margin-right: 30px; 
+}
+
+#legends-payment-methods {
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+  margin: 5px;
+  font-size: 90%
+}
+
+.conteiner-installment-options input {
+  margin: 0;
+  padding: 0;
+}
+
+.conteiner-installment-options label {
+  margin: 0;
+  margin-bottom: 8px;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+}
+
+.conteiner-installment-options {
+  margin: 0;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+  padding-left: 52px;
+}
+
+.container-progress-bar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	height: 15px;
+	background-color: #f9f9f9;
+	position: relative;
+	width: 99%;
+	margin: 0 auto;
+	margin-bottom: 15px;
+}
+
+.progress-bar {
+	position: absolute;
+	height: 100%;
+	animation: progress-animation 1.3s;
+	width: 75%;
+	border-radius: 4px;
+	background-color: rgb(72, 54, 152);
+}
+
+.container-progress-bar span {
+	width: 20%;
+	color: rgb(72, 54, 152);
+	right: 0;
+	position: absolute;
+	font-size: 100%;
 }
 </style>>
