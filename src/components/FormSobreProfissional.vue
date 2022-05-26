@@ -13,7 +13,7 @@
             name="nome-completo"
             placeholder="Digite o nome completo"
           >
-          <span style="color: #DC3545">{{ errorFullName }}</span>
+          <span>{{ errorFullName }}</span>
         </div>
         <div class="container-inputs container-input-cpf">
           <label htmlFor="cpf">CPF*</label>
@@ -24,7 +24,7 @@
             name="cpf"
             placeholder="Digite um CPF"
           >
-          <span style="color: #DC3545">{{ errorCpf }}</span>
+          <span>{{ errorCpf }}</span>
         </div>
         <div class="container-inputs container-input-phone-number">
           <label htmlFor="numero-celular">Número de celular*</label>
@@ -37,7 +37,7 @@
             maxlength="11"
             placeholder="(00) 0 0000-0000"
           >
-          <span style="color: #DC3545">{{ errorPhoneNumber }}</span>
+          <span>{{ errorPhoneNumber }}</span>
         </div>
         <div class="container-selects">
           <div class="container-select-estado">
@@ -57,12 +57,11 @@
               <option
                 v-for="state in states"
                 :key="state.id"
-                value="{{ state.sigla }}"
               >
                 {{ state.sigla }}
               </option>
             </select>
-            <span style="color: #DC3545">{{ errorState }}</span>
+            <span>{{ errorState }}</span>
           </div>
           <div class="container-select-cidade">
             <label htmlFor="select-cidade">Cidade*</label>
@@ -80,12 +79,11 @@
               <option
                 v-for="city in citys"
                 :key="city.id"
-                value="{{city.nome}}"
               >
                 {{ city.nome }}
               </option>
             </select>
-            <span style="color: #DC3545">{{ errorCity }}</span>
+            <span>{{ errorCity }}</span>
           </div>
         </div>
         <div class="container-progress-bar">
@@ -239,7 +237,7 @@ export default {
 			this.validateState();
 			this.validateCity();
 			if (!this.errors.length > 0) {
-				return this.validForm = true;
+				return true;
 			}
 			this.errors = [];
 		},
@@ -308,6 +306,7 @@ export default {
 .container-inputs span {
 	margin-bottom: 8px;
 	font-size: 80%;
+	color: #DC3545;
 }
 
 .container-input-cpf {
@@ -344,6 +343,7 @@ export default {
 
 .container-select-estado span, .container-select-cidade span {
 	font-size: 80%;
+	color: #DC3545
 }
 
 .container-select-cidade {
