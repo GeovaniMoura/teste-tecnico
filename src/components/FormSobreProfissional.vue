@@ -237,6 +237,11 @@ export default {
 			this.validateState();
 			this.validateCity();
 			if (!this.errors.length > 0) {
+				this.$store.dispatch('saveFormInfos', { key: 'fullName', value: this.fullName } );
+				this.$store.dispatch('saveFormInfos', { key: 'cpf', value: this.cpf } );
+				this.$store.dispatch('saveFormInfos', { key: 'phoneNumber', value: this.phoneNumber } );
+				this.$store.dispatch('saveFormInfos', { key: 'state', value: this.selectedState } );
+				this.$store.dispatch('saveFormInfos', { key: 'city', value: this.selectedCity } );
 				return true;
 			}
 			this.errors = [];

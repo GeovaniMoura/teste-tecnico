@@ -10,7 +10,12 @@ const routes = [
   {
     path: '/sobreatendimento',
     name: 'FormSobreAtendimento',
-    component: () => import(/* webpackChunkName: "FormSobreAtendimento" */ '../components/FormSobreAtendimento.vue')
+    component: () => import('../components/FormSobreAtendimento.vue')
+  },
+  {
+    path: '/detalhesdocadastro',
+    name: 'DetalhesDoCadastro',
+    component: () => import('../components/DetalhesDoCadastro.vue')
   }
 ]
 

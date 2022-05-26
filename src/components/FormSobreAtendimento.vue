@@ -25,7 +25,6 @@
             <option
               v-for="specialty in mainSpecialtys"
               :key="specialty.id"
-              value="{{specialty.nome}}"
             >
               {{ specialty.nome }}
             </option>
@@ -55,6 +54,7 @@
             <input
               id="checkbox-cash"
               type="checkbox"
+              @change="checkboxCash"
             >
             Em dinheiro
           </label>
@@ -62,6 +62,7 @@
             <input
               id="checkbox-pix"
               type="checkbox"
+              @change="checkboxPix"
             >
             Pix
           </label>
@@ -71,7 +72,7 @@
                 id="checkbox-card"
                 v-model="valueCheckboxCard"
                 type="checkbox"
-                @change="() => selectedInstallmentOption = ''"
+                @change="checkBoxCard"
               >
               Cartão de crédito
               <div
@@ -113,14 +114,14 @@
               </div>
             </label>
           </div>
-          <span>{{ errorMainSpecialty }}</span>
+          <span>{{ errorSelectedPaymentMethods }}</span>
         </div>
         <div class="container-progress-bar">
           <div class="progress-bar" />
           <span>2 de 2</span>
         </div>
         <ButtonNext
-          url="/sobre"
+          url="/detalhesdocadastro"
           :check-form-is-valid="checkFormIsValid"
         />
       </form>
@@ -146,6 +147,7 @@ export default {
       selectedPaymentMethods: [],
       valueCheckboxCard: false,
       selectedInstallmentOption: '',
+      errorSelectedPaymentMethods: '',
       errors: [],
     }
   },
@@ -190,10 +192,50 @@ export default {
         this.errorConsultationPrice = '';
       }
     },
+    checkboxCash({ target }) {
+      if (target.checked) {
+        this.selectedPaymentMethods.push('Dinheiro');
+      } else {
+        this.selectedPaymentMethods = this.selectedPaymentMethods.filter(
+          (item) => item !== 'Dinheiro'
+        )
+      }
+    },
+    checkboxPix({ target }) {
+      if (target.checked) {
+        this.selectedPaymentMethods.push('Pix');
+      } else {
+        this.selectedPaymentMethods = this.selectedPaymentMethods.filter(
+          (item) => item !== 'Pix'
+        )
+      }
+    },
+    checkBoxCard({ target }) {
+      if (target.checked) {
+        this.selectedPaymentMethods.push('Card');
+      } else {
+        this.selectedPaymentMethods = this.selectedPaymentMethods.filter(
+          (item) => item !== 'Card'
+        )
+        this.selectedInstallmentOption = '';
+      }
+    },
+    validatePaymentMethods() {
+      if (!this.selectedPaymentMethods.length > 0) {
+        this.errorSelectedPaymentMethods = 'Selecione uma forma de pagamento';
+        this.errors.push('Selecione uma forma de pagamento');
+      } else {
+        this.errorConsultationPrice = '';
+      }
+    },
     checkFormIsValid() {
       this.validateMainSpecialty();
       this.validateConsultationPrice();
+      this.validatePaymentMethods();
       if (!this.errors.length > 0) {
+        this.$store.dispatch('saveFormInfos', { key: 'mainSpecialty', value: this.selectedMainSpecialty } );
+				this.$store.dispatch('saveFormInfos', { key: 'consultationPrice', value: this.consultationPrice } );
+				this.$store.dispatch('saveFormInfos', { key: 'paymentMethods', value: this.selectedPaymentMethods } );
         return true;
       }
       this.errors = [];
@@ -294,8 +336,10 @@ span {
 }
 
 .container-input-consultation-price label {
+  color: white;
   margin: 0;
-  padding: 6px;
+  padding: 6px 0;
+  text-align: center;
   background-color: rgb(72, 54, 152);
   width: 15%;
   font-size: 100%
