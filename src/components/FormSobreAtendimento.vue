@@ -48,6 +48,30 @@
           </label>
           <span>{{ errorConsultationPrice }}</span>
         </div>
+        <div class="container-checkbox-payment-methods">
+          <p>Formas de pagamento da consulta*</p>
+          <label htmlFor="checkbox-cash">
+            <input
+              id="checkbox-cash"
+              type="checkbox"
+            >
+            Em dinheiro
+          </label>
+          <label htmlFor="checkbox-pix">
+            <input
+              id="checkbox-pix"
+              type="checkbox"
+            >
+            Pix
+          </label>
+          <label htmlFor="checkbox-card">
+            <input
+              id="checkbox-card"
+              type="checkbox"
+            >
+            Cartão de crédito
+          </label>
+        </div>
         <button @click="formIsValid">
           Teste
         </button>
@@ -147,13 +171,24 @@ export default {
   margin-bottom: 0;
   width: 100%;
   display: flex;
-  align-items: center;
   border-radius: 30px 30px 0 0;
   flex-flow: column nowrap;
   justify-content: flex-start;
   padding: 20px;
 	padding-top: 20px;
   padding-bottom: 0px;
+}
+
+.container-main h1 {
+	color: #3f2796;
+	margin-bottom: 20px;
+}
+
+.container-main h2 {
+	color: #0e0e0e;
+	margin-bottom: 15px;
+	font-weight: 600;
+	font-size: 18px;
 }
 
 .container-back-page {
@@ -171,5 +206,17 @@ export default {
 
 .container-input-consultation-price span {
   color: #DC3545;
+}
+
+.container-checkbox-payment-methods {
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.container-checkbox-payment-methods label {
+  border-radius: 10px;
+  padding: 12px;
+  margin: 10px;
+  box-shadow: 0 0.8px 0.8px 0.8px #b9b9b9;
 }
 </style>>
