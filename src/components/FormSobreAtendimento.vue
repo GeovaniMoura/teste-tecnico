@@ -175,8 +175,16 @@ export default {
     if (localStorage.getItem('Data')) {
 			const saveInfos = JSON.parse(localStorage.getItem('Data'));
 			this.selectedMainSpecialty = saveInfos.mainSpecialty;
+      console.log(saveInfos.consultationPrice);
 			this.consultationPrice = parseFloat(saveInfos.consultationPrice.replace('R$ ', '').replace(',', '.'));
+      console.log(this.consultationPrice);
 		}
+  },
+  beforeUpdate() {
+    if (localStorage.getItem('Data')) {
+      const saveInfos = JSON.parse(localStorage.getItem('Data'));
+      this.consultationPrice = parseFloat(saveInfos.consultationPrice.replace('R$ ', '').replace(',', '.'));
+    }
   },
   methods: {
     ...mapActions(['saveFormInfos']),
