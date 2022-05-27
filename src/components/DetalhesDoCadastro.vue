@@ -42,7 +42,7 @@
       </div>
       <div>
         <ButtonNext
-          url="/conclusao"
+          url="/conclusaodocadastro"
         />
       </div>
     </div>

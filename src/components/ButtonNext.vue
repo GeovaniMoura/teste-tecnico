@@ -1,20 +1,21 @@
 <template>
   <div class="button-submit">
     <button
-      v-if="url === '/conclusao'"
+      v-if="url === '/conclusaodocadastro'"
       class="button-register"
+      @click="goToLastStep"
     >
       CADASTRAR PROFISSIONAL
     </button>
     <button
-      v-if="url === '/conclusao'"
+      v-if="url === '/conclusaodocadastro'"
       class="button-edit-infos"
       @click="editForms"
     >
       Editar cadastro
     </button>
     <button
-      v-if="url !== '/conclusao'"
+      v-if="url !== '/conclusaodocadastro'"
       class=""
       type="button"
       @click="verifyFormIsValid"
@@ -72,6 +73,9 @@
           paymentMethods: this.paymentMethods,
         }))
         this.$router.push('/');
+      },
+      goToLastStep() {
+        this.$router.push('/conclusaodocadastro');
       }
     }
   }
