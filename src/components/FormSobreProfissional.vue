@@ -103,6 +103,7 @@
 import ButtonNext from './ButtonNext.vue'
 import { cpf } from 'cpf-cnpj-validator';
 const parse = require('telefone/parse');
+import { mapActions } from 'vuex';
 
 export default {
 	name: 'FormSobreProfissional',
@@ -143,11 +144,26 @@ export default {
 				}
 			}
 		},
+		selectedState: async function () {
+			await this.getCitys();
+		}
 	},
-	mounted() {
-		this.getStates();
+	async mounted() {
+		await this.getStates();
+
+		if (localStorage.getItem('Data')) {
+			const saveInfos = JSON.parse(localStorage.getItem('Data'));
+			if (saveInfos.fullName !== '') {
+				this.fullName = saveInfos.fullName;
+				this.cpf = saveInfos.cpf;
+				this.phoneNumber = saveInfos.phoneNumber;
+				this.selectedState =  saveInfos.state.sigla;
+				this.selectedCity = saveInfos.city;
+			}
+		}
 	},
 	methods: {
+		...mapActions(['saveFormInfos']),
 		async getCpfs() {
 			const req = await fetch(
 				'https://api-teste-front-end-fc.herokuapp.com/profissionais'
@@ -173,19 +189,30 @@ export default {
 			this.states = data;
 		},
 		async getCitys(target) {
-				const selectedState = this.states.find(
-					(item) => item.sigla === target.value
-				);
-				const req = await fetch(
-					`https://api-teste-front-end-fc.herokuapp.com/estados/${selectedState.id}/cidades`
-				);
-				if (req.status === 404) {
-					let errorResponse = await req.json();
-					this.errors.push(errorResponse.error);
-					return console.log('Not Found');
+			let selectedState;
+				if (target) {
+					selectedState = this.states.find(
+						(item) => item.sigla === target.value
+					);
+				} else {
+					selectedState = this.states.find(
+						(item) => item.sigla === this.selectedState
+					);
 				}
-				const data = await req.json();
-				this.citys = data;
+				if(selectedState) {
+					const req = await fetch(
+						`https://api-teste-front-end-fc.herokuapp.com/estados/${selectedState.id}/cidades`
+					);
+					if (req.status === 404) {
+						let errorResponse = await req.json();
+						this.errors.push(errorResponse.error);
+						return console.log('Not Found');
+					}
+					const data = await req.json();
+					this.citys = data;
+				} else {
+					this.errors.push('Nenhum estado selecionado');
+				}
 		},
 		validateFullName() {
 			if (this.fullName.length < 3 || this.fullName.length > 48) {
@@ -205,7 +232,6 @@ export default {
 		},
 		validatePhoneNumber() {
 			const validPhone = parse(this.phoneNumber, { apenasCelular: true });
-
 			if (!validPhone) {
 				this.errorPhoneNumber = 'Número de celular inválido';
 				this.errors.push('Número de celular inválido');
@@ -237,11 +263,18 @@ export default {
 			this.validateState();
 			this.validateCity();
 			if (!this.errors.length > 0) {
-				this.$store.dispatch('saveFormInfos', { key: 'fullName', value: this.fullName } );
-				this.$store.dispatch('saveFormInfos', { key: 'cpf', value: this.cpf } );
-				this.$store.dispatch('saveFormInfos', { key: 'phoneNumber', value: this.phoneNumber } );
-				this.$store.dispatch('saveFormInfos', { key: 'state', value: this.selectedState } );
-				this.$store.dispatch('saveFormInfos', { key: 'city', value: this.selectedCity } );
+				const findState = this.states.find(item => item.sigla === this.selectedState );
+				if (findState) {
+					this.selectedState = findState;
+				}
+				if (!this.phoneNumber.includes('(') || !this.phoneNumber.includes('-')) {
+					this.phoneNumber = `(${this.phoneNumber.substring(0, 2)}) ${this.phoneNumber.substring(2, 3)} ${this.phoneNumber.substring(3, 7)}-${this.phoneNumber.substring(7, 11)}`;
+				}
+				this.saveFormInfos({ key: 'fullName', value: this.fullName });
+				this.saveFormInfos({ key: 'cpf', value: this.cpf } );
+				this.saveFormInfos({ key: 'phoneNumber', value: this.phoneNumber } );
+				this.saveFormInfos({ key: 'state', value: this.selectedState } );
+				this.saveFormInfos({ key: 'city', value: this.selectedCity } );
 				return true;
 			}
 			this.errors = [];

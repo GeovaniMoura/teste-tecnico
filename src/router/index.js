@@ -16,6 +16,11 @@ const routes = [
     path: '/detalhesdocadastro',
     name: 'DetalhesDoCadastro',
     component: () => import('../components/DetalhesDoCadastro.vue')
+  },
+  {
+    path: '/conclusaodocadastro',
+    name: 'ConclusaoDoCadastro',
+    component: () => import('../components/ConclusaoDoCadastro.vue')
   }
 ]
 

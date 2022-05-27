@@ -67,7 +67,7 @@
             Pix
           </label>
           <div>
-            <label htmlFor="checkbox-card">
+            <label for="checkbox-card">
               <input
                 id="checkbox-card"
                 v-model="valueCheckboxCard"
@@ -83,33 +83,36 @@
                   <label>Parcelamento em</label>
                 </div>
                 <div>
-                  <label>
+                  <label for="firstInstallmenteOption">
                     <input
+                      id="firstInstallmenteOption"
                       v-model="selectedInstallmentOption"
-                      value="1x, sem juros"
+                      value="1x sem juros"
                       type="radio"
                       name="installment"
-                      @change="checkBoxCard"
+                      @change="radioInputInstallmentOption"
                     >
                     1x, sem juros
                   </label>
-                  <label>
+                  <label for="secondInstallmentOption">
                     <input
+                      id="secondInstallmentOption"
                       v-model="selectedInstallmentOption"
-                      value="2x, sem juros"
+                      value="2x sem juros"
                       type="radio"
                       name="installment"
-                      @change="checkBoxCard"
+                      @change="radioInputInstallmentOption"
                     >
                     2x, sem juros
                   </label>
-                  <label>
+                  <label for="thirdInstallmentOption">
                     <input
+                      id="thirdInstallmentOption"
                       v-model="selectedInstallmentOption"
-                      value="3x, sem juros"
+                      value="3x sem juros"
                       type="radio"
                       name="installment"
-                      @change="checkBoxCard"
+                      @change="radioInputInstallmentOption"
                     >
                     3x, sem juros
                   </label>
@@ -117,7 +120,8 @@
               </div>
             </label>
           </div>
-          <span>{{ errorSelectedPaymentMethods }}</span>
+          <span v-if="errorSelectedPaymentMethods !== ''">{{ errorSelectedPaymentMethods }}</span>
+          <span v-if="errorSelectedInstallmentOption !== ''">{{ errorSelectedInstallmentOption }}</span>
         </div>
         <div class="container-progress-bar">
           <div class="progress-bar" />
@@ -134,6 +138,7 @@
 
 <script>
 import ButtonNext from './ButtonNext.vue';
+import { mapActions } from 'vuex';
 
 export default {
   name: 'FormSobreAtendimento',
@@ -150,6 +155,7 @@ export default {
       selectedPaymentMethods: [],
       valueCheckboxCard: false,
       selectedInstallmentOption: '',
+      errorSelectedInstallmentOption: '',
       errorSelectedPaymentMethods: '',
       errors: [],
     }
@@ -165,8 +171,23 @@ export default {
   },
   mounted() {
     this.getSpecialty();
+    
+    if (localStorage.getItem('Data')) {
+			const saveInfos = JSON.parse(localStorage.getItem('Data'));
+			this.selectedMainSpecialty = saveInfos.mainSpecialty;
+      console.log(saveInfos.consultationPrice);
+			this.consultationPrice = parseFloat(saveInfos.consultationPrice.replace('R$ ', '').replace(',', '.'));
+      console.log(this.consultationPrice);
+		}
+  },
+  beforeUpdate() {
+    if (localStorage.getItem('Data')) {
+      const saveInfos = JSON.parse(localStorage.getItem('Data'));
+      this.consultationPrice = parseFloat(saveInfos.consultationPrice.replace('R$ ', '').replace(',', '.'));
+    }
   },
   methods: {
+    ...mapActions(['saveFormInfos']),
     async getSpecialty() {
       const req = await fetch(
         'https://api-teste-front-end-fc.herokuapp.com/especialidades'
@@ -192,11 +213,25 @@ export default {
         this.errorConsultationPrice = 'Digite um valor entre 30,00 e 350,00';
         this.errors.push('Digite um valor entre 30,00 e 350,00');
       } else {
-        this.errorConsultationPrice = '';
+        if (this.consultationPrice.toString().includes('R$')) {
+          this.errorConsultationPrice = '';
+          return this.consultationPrice = this.consultationPrice.toString().replace('.', ',');
+        }
+        this.consultationPrice = `R$ ${this.consultationPrice.toString().replace('.', ',')}`;
+      }
+    },
+    validateInstallmentOption() {
+      const findCard = this.selectedPaymentMethods.find(item => item === 'Card');
+      if (!this.selectedInstallmentOption.length > 0 && findCard ) {
+        this.errorSelectedInstallmentOption = 'Selecione a opção de parcelamento';
+        this.errors.push('Selecione a opção de parcelamento');
+      } else {
+        this.errorSelectedInstallmentOption = '';
       }
     },
     checkboxCash({ target }) {
-      if (target.checked) {
+      const findCash = this.selectedPaymentMethods.find(item => item === 'Dinheiro');
+      if (target.checked && !findCash) {
         this.selectedPaymentMethods.push('Dinheiro');
       } else {
         this.selectedPaymentMethods = this.selectedPaymentMethods.filter(
@@ -205,7 +240,8 @@ export default {
       }
     },
     checkboxPix({ target }) {
-      if (target.checked) {
+      const findPix = this.selectedPaymentMethods.find(item => item === 'Pix');
+      if (target.checked && !findPix) {
         this.selectedPaymentMethods.push('Pix');
       } else {
         this.selectedPaymentMethods = this.selectedPaymentMethods.filter(
@@ -214,13 +250,14 @@ export default {
       }
     },
     checkBoxCard({ target }) {
-      console.log(target.checked);
-      if (target.checked) {
+      const findCard = this.selectedPaymentMethods.find(item => item === 'Card');
+      if (target.checked && !findCard) {
         this.selectedPaymentMethods.push('Card');
-      } else {
-        this.selectedPaymentMethods = this.selectedPaymentMethods.filter(
-          (item) => item !== 'Card'
-        )
+      }
+    },
+    radioInputInstallmentOption() {
+      const findCard = this.selectedPaymentMethods.find(item => item === 'Card');
+      if (!findCard) {
         this.selectedInstallmentOption = '';
       }
     },
@@ -236,10 +273,21 @@ export default {
       this.validateMainSpecialty();
       this.validateConsultationPrice();
       this.validatePaymentMethods();
+      this.validateInstallmentOption();
       if (!this.errors.length > 0) {
-        this.$store.dispatch('saveFormInfos', { key: 'mainSpecialty', value: this.selectedMainSpecialty } );
-				this.$store.dispatch('saveFormInfos', { key: 'consultationPrice', value: this.consultationPrice } );
-				this.$store.dispatch('saveFormInfos', { key: 'paymentMethods', value: this.selectedPaymentMethods } );
+        const findCard = this.selectedPaymentMethods.find(item => item === 'Card');
+        if (findCard) {
+          this.selectedPaymentMethods = [
+          ...this.selectedPaymentMethods.filter((item) => item !== 'Card'),
+          `Cartão de crédito - Parcelamento em ${this.selectedInstallmentOption}`,
+          ]
+        }
+        if (!this.consultationPrice.includes(',')) {
+          this.consultationPrice = `${this.consultationPrice},00`;
+        }
+        this.saveFormInfos({ key: 'mainSpecialty', value: this.selectedMainSpecialty });
+				this.saveFormInfos({ key: 'consultationPrice', value: this.consultationPrice });
+				this.saveFormInfos({ key: 'paymentMethods', value: this.selectedPaymentMethods });
         return true;
       }
       this.errors = [];
