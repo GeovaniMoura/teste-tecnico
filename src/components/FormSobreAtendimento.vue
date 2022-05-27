@@ -67,7 +67,7 @@
             Pix
           </label>
           <div>
-            <label htmlFor="checkbox-card">
+            <label for="checkbox-card">
               <input
                 id="checkbox-card"
                 v-model="valueCheckboxCard"
@@ -83,33 +83,36 @@
                   <label>Parcelamento em</label>
                 </div>
                 <div>
-                  <label>
+                  <label for="firstInstallmenteOption">
                     <input
+                      id="firstInstallmenteOption"
                       v-model="selectedInstallmentOption"
                       value="1x sem juros"
                       type="radio"
                       name="installment"
-                      @change="checkBoxCard"
+                      @change="radioInputInstallmentOption"
                     >
                     1x, sem juros
                   </label>
-                  <label>
+                  <label for="secondInstallmentOption">
                     <input
+                      id="secondInstallmentOption"
                       v-model="selectedInstallmentOption"
                       value="2x sem juros"
                       type="radio"
                       name="installment"
-                      @change="checkBoxCard"
+                      @change="radioInputInstallmentOption"
                     >
                     2x, sem juros
                   </label>
-                  <label>
+                  <label for="thirdInstallmentOption">
                     <input
+                      id="thirdInstallmentOption"
                       v-model="selectedInstallmentOption"
                       value="3x sem juros"
                       type="radio"
                       name="installment"
-                      @change="checkBoxCard"
+                      @change="radioInputInstallmentOption"
                     >
                     3x, sem juros
                   </label>
@@ -168,6 +171,12 @@ export default {
   },
   mounted() {
     this.getSpecialty();
+    
+    if (localStorage.getItem('Data')) {
+			const saveInfos = JSON.parse(localStorage.getItem('Data'));
+			this.selectedMainSpecialty = saveInfos.mainSpecialty;
+			this.consultationPrice = parseFloat(saveInfos.consultationPrice.replace('R$ ', '').replace(',', '.'));
+		}
   },
   methods: {
     ...mapActions(['saveFormInfos']),
@@ -196,13 +205,16 @@ export default {
         this.errorConsultationPrice = 'Digite um valor entre 30,00 e 350,00';
         this.errors.push('Digite um valor entre 30,00 e 350,00');
       } else {
+        if (this.consultationPrice.toString().includes('R$')) {
+          this.errorConsultationPrice = '';
+          return this.consultationPrice = this.consultationPrice.toString().replace('.', ',');
+        }
         this.consultationPrice = `R$ ${this.consultationPrice.toString().replace('.', ',')}`;
-        this.errorConsultationPrice = '';
       }
     },
     validateInstallmentOption() {
       const findCard = this.selectedPaymentMethods.find(item => item === 'Card');
-      if (!this.selectedInstallmentOption.length > 0 && findCard) {
+      if (!this.selectedInstallmentOption.length > 0 && findCard ) {
         this.errorSelectedInstallmentOption = 'Selecione a opção de parcelamento';
         this.errors.push('Selecione a opção de parcelamento');
       } else {
@@ -210,7 +222,8 @@ export default {
       }
     },
     checkboxCash({ target }) {
-      if (target.checked) {
+      const findCash = this.selectedPaymentMethods.find(item => item === 'Dinheiro');
+      if (target.checked && !findCash) {
         this.selectedPaymentMethods.push('Dinheiro');
       } else {
         this.selectedPaymentMethods = this.selectedPaymentMethods.filter(
@@ -219,7 +232,8 @@ export default {
       }
     },
     checkboxPix({ target }) {
-      if (target.checked) {
+      const findPix = this.selectedPaymentMethods.find(item => item === 'Pix');
+      if (target.checked && !findPix) {
         this.selectedPaymentMethods.push('Pix');
       } else {
         this.selectedPaymentMethods = this.selectedPaymentMethods.filter(
@@ -228,12 +242,14 @@ export default {
       }
     },
     checkBoxCard({ target }) {
-      if (target.checked) {
+      const findCard = this.selectedPaymentMethods.find(item => item === 'Card');
+      if (target.checked && !findCard) {
         this.selectedPaymentMethods.push('Card');
-      } else {
-        this.selectedPaymentMethods = this.selectedPaymentMethods.filter(
-          (item) => item !== 'Card'
-        )
+      }
+    },
+    radioInputInstallmentOption() {
+      const findCard = this.selectedPaymentMethods.find(item => item === 'Card');
+      if (!findCard) {
         this.selectedInstallmentOption = '';
       }
     },
@@ -249,7 +265,7 @@ export default {
       this.validateMainSpecialty();
       this.validateConsultationPrice();
       this.validatePaymentMethods();
-      this.validateInstallmentOption()
+      this.validateInstallmentOption();
       if (!this.errors.length > 0) {
         const findCard = this.selectedPaymentMethods.find(item => item === 'Card');
         if (findCard) {
@@ -261,7 +277,6 @@ export default {
         if (!this.consultationPrice.includes(',')) {
           this.consultationPrice = `${this.consultationPrice},00`;
         }
-        console.log(this.consultationPrice);
         this.saveFormInfos({ key: 'mainSpecialty', value: this.selectedMainSpecialty });
 				this.saveFormInfos({ key: 'consultationPrice', value: this.consultationPrice });
 				this.saveFormInfos({ key: 'paymentMethods', value: this.selectedPaymentMethods });

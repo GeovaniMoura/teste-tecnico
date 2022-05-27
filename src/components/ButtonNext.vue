@@ -1,6 +1,21 @@
 <template>
   <div class="button-submit">
     <button
+      v-if="url === '/conclusao'"
+      class="button-register"
+    >
+      CADASTRAR PROFISSIONAL
+    </button>
+    <button
+      v-if="url === '/conclusao'"
+      class="button-edit-infos"
+      @click="editForms"
+    >
+      Editar cadastro
+    </button>
+    <button
+      v-if="url !== '/conclusao'"
+      class=""
       type="button"
       @click="verifyFormIsValid"
     >
@@ -10,6 +25,8 @@
 </template>
 
 <script>
+  import { mapState } from 'vuex';
+
   export default {
     name: 'ButtonNext',
     props: {
@@ -20,16 +37,41 @@
       },
       checkFormIsValid: {
         type: Function,
-        required: true,
+        required: false,
         default: () => {},
       }
     },
+    computed: {
+    ...mapState({
+      fullName: state => state.fullName,
+      cpf: state => state.cpf,
+      phoneNumber: state => state.phoneNumber,
+      state: state => state.state,
+      city: state => state.city,
+      mainSpecialty: state => state.mainSpecialty,
+      consultationPrice: state => state.consultationPrice,
+      paymentMethods: state => state.paymentMethods,
+    }),
+  },
     methods: {
       async verifyFormIsValid() {
         const formIsValid =  await this.checkFormIsValid();
         if (formIsValid) {
-          this.$router.push(this.url)
+          this.$router.push(this.url);
         }
+      },
+      editForms() {
+        localStorage.setItem('Data', JSON.stringify({
+          fullName: this.fullName,
+          cpf: this.cpf,
+          phoneNumber: this.phoneNumber,
+          state: this.state,
+          city: this.city,
+          mainSpecialty: this.mainSpecialty,
+          consultationPrice: this.consultationPrice,
+          paymentMethods: this.paymentMethods,
+        }))
+        this.$router.push('/');
       }
     }
   }
@@ -43,5 +85,23 @@ button {
   border: none;
   padding: 5px;
   color: white;
+  font-size: 85%;
+}
+
+.button-register {
+  text-align: center;
+  width: 100%;
+  border-radius: 20px;
+  border: none;
+  background-color: rgb(255, 231, 102);
+  color: black;
+  padding: 5px 30px;
+}
+
+.button-edit-infos {
+  background-color: #f9f9f9;
+  color: rgb(72, 54, 152);
+  font-size: 90%;
+  text-align: center;
 }
 </style>

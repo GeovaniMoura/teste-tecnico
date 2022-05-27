@@ -40,35 +40,36 @@
           {{ methodPayment }}
         </p>
       </div>
-      <button @click="editForms">
-        Editar cadastro
-      </button>
+      <div>
+        <ButtonNext
+          url="/conclusao"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
+import ButtonNext from './ButtonNext.vue';
 
 export default {
   name: 'DetalhesDoCadastro',
+  components: {
+    ButtonNext,
+  },
   computed: {
     ...mapState({
       fullName: state => state.fullName,
       cpf: state => state.cpf,
       phoneNumber: state => state.phoneNumber,
-      state: state => state.state,
+      state: state => state.state.nome,
       city: state => state.city,
       mainSpecialty: state => state.mainSpecialty,
       consultationPrice: state => state.consultationPrice,
       paymentMethods: state => state.paymentMethods,
     }),
   },
-  methods: {
-    editForms() {
-      this.$router.push('/');
-    }
-  }
 }
 </script>
 

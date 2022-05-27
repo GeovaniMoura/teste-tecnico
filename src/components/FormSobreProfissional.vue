@@ -144,9 +144,23 @@ export default {
 				}
 			}
 		},
+		selectedState: async function () {
+			await this.getCitys();
+		}
 	},
-	mounted() {
-		this.getStates();
+	async mounted() {
+		await this.getStates();
+
+		if (localStorage.getItem('Data')) {
+			const saveInfos = JSON.parse(localStorage.getItem('Data'));
+			if (saveInfos.fullName !== '') {
+				this.fullName = saveInfos.fullName;
+				this.cpf = saveInfos.cpf;
+				this.phoneNumber = saveInfos.phoneNumber;
+				this.selectedState =  saveInfos.state.sigla;
+				this.selectedCity = saveInfos.city;
+			}
+		}
 	},
 	methods: {
 		...mapActions(['saveFormInfos']),
@@ -175,19 +189,30 @@ export default {
 			this.states = data;
 		},
 		async getCitys(target) {
-				const selectedState = this.states.find(
-					(item) => item.sigla === target.value
-				);
-				const req = await fetch(
-					`https://api-teste-front-end-fc.herokuapp.com/estados/${selectedState.id}/cidades`
-				);
-				if (req.status === 404) {
-					let errorResponse = await req.json();
-					this.errors.push(errorResponse.error);
-					return console.log('Not Found');
+			let selectedState;
+				if (target) {
+					selectedState = this.states.find(
+						(item) => item.sigla === target.value
+					);
+				} else {
+					selectedState = this.states.find(
+						(item) => item.sigla === this.selectedState
+					);
 				}
-				const data = await req.json();
-				this.citys = data;
+				if(selectedState) {
+					const req = await fetch(
+						`https://api-teste-front-end-fc.herokuapp.com/estados/${selectedState.id}/cidades`
+					);
+					if (req.status === 404) {
+						let errorResponse = await req.json();
+						this.errors.push(errorResponse.error);
+						return console.log('Not Found');
+					}
+					const data = await req.json();
+					this.citys = data;
+				} else {
+					this.errors.push('Nenhum estado selecionado');
+				}
 		},
 		validateFullName() {
 			if (this.fullName.length < 3 || this.fullName.length > 48) {
@@ -240,9 +265,11 @@ export default {
 			if (!this.errors.length > 0) {
 				const findState = this.states.find(item => item.sigla === this.selectedState );
 				if (findState) {
-					this.selectedState = findState.nome;
+					this.selectedState = findState;
 				}
-				this.phoneNumber = `(${this.phoneNumber.substring(0, 2)}) ${this.phoneNumber.substring(2, 3)} ${this.phoneNumber.substring(3, 7)}-${this.phoneNumber.substring(7, 11)}`;
+				if (!this.phoneNumber.includes('(') || !this.phoneNumber.includes('-')) {
+					this.phoneNumber = `(${this.phoneNumber.substring(0, 2)}) ${this.phoneNumber.substring(2, 3)} ${this.phoneNumber.substring(3, 7)}-${this.phoneNumber.substring(7, 11)}`;
+				}
 				this.saveFormInfos({ key: 'fullName', value: this.fullName });
 				this.saveFormInfos({ key: 'cpf', value: this.cpf } );
 				this.saveFormInfos({ key: 'phoneNumber', value: this.phoneNumber } );
