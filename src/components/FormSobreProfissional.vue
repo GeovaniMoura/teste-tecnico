@@ -3,7 +3,7 @@
     <div class="container-main">
       <h1>Sobre o profissional</h1>
       <h2>Dados do profissional</h2>
-      <form @submit="checkForm">
+      <form>
         <div class="container-inputs">
           <label htmlFor="nome-completo">Nome Completo*</label>
           <input
@@ -13,7 +13,7 @@
             name="nome-completo"
             placeholder="Digite o nome completo"
           >
-          <span style="color: #DC3545">{{ errorFullName }}</span>
+          <span>{{ errorFullName }}</span>
         </div>
         <div class="container-inputs container-input-cpf">
           <label htmlFor="cpf">CPF*</label>
@@ -24,7 +24,7 @@
             name="cpf"
             placeholder="Digite um CPF"
           >
-          <span style="color: #DC3545">{{ errorCpf }}</span>
+          <span>{{ errorCpf }}</span>
         </div>
         <div class="container-inputs container-input-phone-number">
           <label htmlFor="numero-celular">Número de celular*</label>
@@ -37,7 +37,7 @@
             maxlength="11"
             placeholder="(00) 0 0000-0000"
           >
-          <span style="color: #DC3545">{{ errorPhoneNumber }}</span>
+          <span>{{ errorPhoneNumber }}</span>
         </div>
         <div class="container-selects">
           <div class="container-select-estado">
@@ -61,7 +61,7 @@
                 {{ state.sigla }}
               </option>
             </select>
-            <span style="color: #DC3545">{{ errorState }}</span>
+            <span>{{ errorState }}</span>
           </div>
           <div class="container-select-cidade">
             <label htmlFor="select-cidade">Cidade*</label>
@@ -83,14 +83,17 @@
                 {{ city.nome }}
               </option>
             </select>
-            <span style="color: #DC3545">{{ errorCity }}</span>
+            <span>{{ errorCity }}</span>
           </div>
         </div>
         <div class="container-progress-bar">
           <div class="progress-bar" />
           <span>1 de 2</span>
         </div>
-        <ButtonNext />
+        <ButtonNext
+          url="/sobreatendimento"
+          :check-form-is-valid="checkFormIsValid"
+        />
       </form>
     </div>
   </div>
@@ -150,7 +153,7 @@ export default {
 				'https://api-teste-front-end-fc.herokuapp.com/profissionais'
 			);
 			if (req.status === 404) {
-				let errorResponse = req.json();
+				let errorResponse = await req.json();
 				this.errors.push(errorResponse.error);
 				return console.log('Not Found');
 			} 
@@ -162,7 +165,7 @@ export default {
 				'https://api-teste-front-end-fc.herokuapp.com/estados'
 			);
 			if (req.status === 404) {
-				let errorResponse = req.json();
+				let errorResponse = await req.json();
 				this.errors.push(errorResponse.error);
 				return console.log('Not Found');
 			} 
@@ -177,7 +180,7 @@ export default {
 					`https://api-teste-front-end-fc.herokuapp.com/estados/${selectedState.id}/cidades`
 				);
 				if (req.status === 404) {
-					let errorResponse = req.json();
+					let errorResponse = await req.json();
 					this.errors.push(errorResponse.error);
 					return console.log('Not Found');
 				}
@@ -226,17 +229,22 @@ export default {
 				this.errorCity = '';
 			}
 		},
-		checkForm(event) {
+		async checkFormIsValid() {
 			this.validateFullName();
 			this.validateCpf();
 			this.validatePhoneNumber();
-			this.getCpfs();
+			await this.getCpfs();
 			this.validateState();
 			this.validateCity();
 			if (!this.errors.length > 0) {
+				this.$store.dispatch('saveFormInfos', { key: 'fullName', value: this.fullName } );
+				this.$store.dispatch('saveFormInfos', { key: 'cpf', value: this.cpf } );
+				this.$store.dispatch('saveFormInfos', { key: 'phoneNumber', value: this.phoneNumber } );
+				this.$store.dispatch('saveFormInfos', { key: 'state', value: this.selectedState } );
+				this.$store.dispatch('saveFormInfos', { key: 'city', value: this.selectedCity } );
 				return true;
 			}
-			event.preventDefault();
+			this.errors = [];
 		},
 	},
 };
@@ -253,23 +261,20 @@ export default {
 .container {
 	background-color: #ffe766;
 	height: 100vh;
-	width: 100vw;
+	min-width: 100vw;
 	display: flex;
-	justify-content: center;
-	flex-wrap: nowrap;
-	align-items: flex-end;
 }
 
 .container-main {
 	background-color: white;
 	display: flex;
-	flex-flow: column wrap;
+	flex-flow: column nowrap;
 	justify-content: flex-start;
 	border-radius: 30px 30px 0 0;
 	padding: 20px;
 	padding-top: 20px;
 	width: 100%;
-	height: 95%;
+	height: 90%;
 	margin: auto;
 	margin-bottom: 0;
 	padding-bottom: 0px;
@@ -306,6 +311,7 @@ export default {
 .container-inputs span {
 	margin-bottom: 8px;
 	font-size: 80%;
+	color: #DC3545;
 }
 
 .container-input-cpf {
@@ -342,6 +348,7 @@ export default {
 
 .container-select-estado span, .container-select-cidade span {
 	font-size: 80%;
+	color: #DC3545
 }
 
 .container-select-cidade {
