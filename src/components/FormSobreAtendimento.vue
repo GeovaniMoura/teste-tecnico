@@ -86,7 +86,7 @@
                   <label>
                     <input
                       v-model="selectedInstallmentOption"
-                      value="1x, sem juros"
+                      value="1x sem juros"
                       type="radio"
                       name="installment"
                       @change="checkBoxCard"
@@ -96,7 +96,7 @@
                   <label>
                     <input
                       v-model="selectedInstallmentOption"
-                      value="2x, sem juros"
+                      value="2x sem juros"
                       type="radio"
                       name="installment"
                       @change="checkBoxCard"
@@ -106,7 +106,7 @@
                   <label>
                     <input
                       v-model="selectedInstallmentOption"
-                      value="3x, sem juros"
+                      value="3x sem juros"
                       type="radio"
                       name="installment"
                       @change="checkBoxCard"
@@ -237,6 +237,13 @@ export default {
       this.validateConsultationPrice();
       this.validatePaymentMethods();
       if (!this.errors.length > 0) {
+        const findCard = this.selectedPaymentMethods.find(item => item === 'Card');
+        if (findCard) {
+          this.selectedPaymentMethods = [
+          ...this.selectedPaymentMethods.filter((item) => item !== 'Card'),
+          `Cartão de crédito - Parcelamento em ${this.selectedInstallmentOption}`,
+          ]
+        }
         this.$store.dispatch('saveFormInfos', { key: 'mainSpecialty', value: this.selectedMainSpecialty } );
 				this.$store.dispatch('saveFormInfos', { key: 'consultationPrice', value: this.consultationPrice } );
 				this.$store.dispatch('saveFormInfos', { key: 'paymentMethods', value: this.selectedPaymentMethods } );
