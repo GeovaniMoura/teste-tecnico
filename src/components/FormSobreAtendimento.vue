@@ -89,6 +89,7 @@
                       value="1x, sem juros"
                       type="radio"
                       name="installment"
+                      @change="checkBoxCard"
                     >
                     1x, sem juros
                   </label>
@@ -98,6 +99,7 @@
                       value="2x, sem juros"
                       type="radio"
                       name="installment"
+                      @change="checkBoxCard"
                     >
                     2x, sem juros
                   </label>
@@ -107,6 +109,7 @@
                       value="3x, sem juros"
                       type="radio"
                       name="installment"
+                      @change="checkBoxCard"
                     >
                     3x, sem juros
                   </label>
@@ -211,6 +214,7 @@ export default {
       }
     },
     checkBoxCard({ target }) {
+      console.log(target.checked);
       if (target.checked) {
         this.selectedPaymentMethods.push('Card');
       } else {
