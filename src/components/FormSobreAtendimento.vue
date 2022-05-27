@@ -117,7 +117,8 @@
               </div>
             </label>
           </div>
-          <span>{{ errorSelectedPaymentMethods }}</span>
+          <span v-if="errorSelectedPaymentMethods !== ''">{{ errorSelectedPaymentMethods }}</span>
+          <span v-if="errorSelectedInstallmentOption !== ''">{{ errorSelectedInstallmentOption }}</span>
         </div>
         <div class="container-progress-bar">
           <div class="progress-bar" />
@@ -134,6 +135,7 @@
 
 <script>
 import ButtonNext from './ButtonNext.vue';
+import { mapActions } from 'vuex';
 
 export default {
   name: 'FormSobreAtendimento',
@@ -150,6 +152,7 @@ export default {
       selectedPaymentMethods: [],
       valueCheckboxCard: false,
       selectedInstallmentOption: '',
+      errorSelectedInstallmentOption: '',
       errorSelectedPaymentMethods: '',
       errors: [],
     }
@@ -167,6 +170,7 @@ export default {
     this.getSpecialty();
   },
   methods: {
+    ...mapActions(['saveFormInfos']),
     async getSpecialty() {
       const req = await fetch(
         'https://api-teste-front-end-fc.herokuapp.com/especialidades'
@@ -192,7 +196,17 @@ export default {
         this.errorConsultationPrice = 'Digite um valor entre 30,00 e 350,00';
         this.errors.push('Digite um valor entre 30,00 e 350,00');
       } else {
+        this.consultationPrice = `R$ ${this.consultationPrice.toString().replace('.', ',')}`;
         this.errorConsultationPrice = '';
+      }
+    },
+    validateInstallmentOption() {
+      const findCard = this.selectedPaymentMethods.find(item => item === 'Card');
+      if (!this.selectedInstallmentOption.length > 0 && findCard) {
+        this.errorSelectedInstallmentOption = 'Selecione a opção de parcelamento';
+        this.errors.push('Selecione a opção de parcelamento');
+      } else {
+        this.errorSelectedInstallmentOption = '';
       }
     },
     checkboxCash({ target }) {
@@ -214,7 +228,6 @@ export default {
       }
     },
     checkBoxCard({ target }) {
-      console.log(target.checked);
       if (target.checked) {
         this.selectedPaymentMethods.push('Card');
       } else {
@@ -236,6 +249,7 @@ export default {
       this.validateMainSpecialty();
       this.validateConsultationPrice();
       this.validatePaymentMethods();
+      this.validateInstallmentOption()
       if (!this.errors.length > 0) {
         const findCard = this.selectedPaymentMethods.find(item => item === 'Card');
         if (findCard) {
@@ -244,9 +258,13 @@ export default {
           `Cartão de crédito - Parcelamento em ${this.selectedInstallmentOption}`,
           ]
         }
-        this.$store.dispatch('saveFormInfos', { key: 'mainSpecialty', value: this.selectedMainSpecialty } );
-				this.$store.dispatch('saveFormInfos', { key: 'consultationPrice', value: this.consultationPrice } );
-				this.$store.dispatch('saveFormInfos', { key: 'paymentMethods', value: this.selectedPaymentMethods } );
+        if (!this.consultationPrice.includes(',')) {
+          this.consultationPrice = `${this.consultationPrice},00`;
+        }
+        console.log(this.consultationPrice);
+        this.saveFormInfos({ key: 'mainSpecialty', value: this.selectedMainSpecialty });
+				this.saveFormInfos({ key: 'consultationPrice', value: this.consultationPrice });
+				this.saveFormInfos({ key: 'paymentMethods', value: this.selectedPaymentMethods });
         return true;
       }
       this.errors = [];

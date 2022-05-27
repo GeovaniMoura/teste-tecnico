@@ -103,6 +103,7 @@
 import ButtonNext from './ButtonNext.vue'
 import { cpf } from 'cpf-cnpj-validator';
 const parse = require('telefone/parse');
+import { mapActions } from 'vuex';
 
 export default {
 	name: 'FormSobreProfissional',
@@ -148,6 +149,7 @@ export default {
 		this.getStates();
 	},
 	methods: {
+		...mapActions(['saveFormInfos']),
 		async getCpfs() {
 			const req = await fetch(
 				'https://api-teste-front-end-fc.herokuapp.com/profissionais'
@@ -205,7 +207,6 @@ export default {
 		},
 		validatePhoneNumber() {
 			const validPhone = parse(this.phoneNumber, { apenasCelular: true });
-
 			if (!validPhone) {
 				this.errorPhoneNumber = 'Número de celular inválido';
 				this.errors.push('Número de celular inválido');
@@ -237,11 +238,16 @@ export default {
 			this.validateState();
 			this.validateCity();
 			if (!this.errors.length > 0) {
-				this.$store.dispatch('saveFormInfos', { key: 'fullName', value: this.fullName } );
-				this.$store.dispatch('saveFormInfos', { key: 'cpf', value: this.cpf } );
-				this.$store.dispatch('saveFormInfos', { key: 'phoneNumber', value: this.phoneNumber } );
-				this.$store.dispatch('saveFormInfos', { key: 'state', value: this.selectedState } );
-				this.$store.dispatch('saveFormInfos', { key: 'city', value: this.selectedCity } );
+				const findState = this.states.find(item => item.sigla === this.selectedState );
+				if (findState) {
+					this.selectedState = findState.nome;
+				}
+				this.phoneNumber = `(${this.phoneNumber.substring(0, 2)}) ${this.phoneNumber.substring(2, 3)} ${this.phoneNumber.substring(3, 7)}-${this.phoneNumber.substring(7, 11)}`;
+				this.saveFormInfos({ key: 'fullName', value: this.fullName });
+				this.saveFormInfos({ key: 'cpf', value: this.cpf } );
+				this.saveFormInfos({ key: 'phoneNumber', value: this.phoneNumber } );
+				this.saveFormInfos({ key: 'state', value: this.selectedState } );
+				this.saveFormInfos({ key: 'city', value: this.selectedCity } );
 				return true;
 			}
 			this.errors = [];
