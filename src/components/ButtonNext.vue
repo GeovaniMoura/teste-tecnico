@@ -68,9 +68,6 @@
           phoneNumber: this.phoneNumber,
           state: this.state,
           city: this.city,
-          mainSpecialty: this.mainSpecialty,
-          consultationPrice: this.consultationPrice,
-          paymentMethods: this.paymentMethods,
         }))
         this.$router.push('/');
       },

@@ -162,6 +162,7 @@ export default {
   },
   watch: {
     consultationPrice: function () {
+      console.log(this.errorConsultationPrice);
       if ((this.consultationPrice.toString().length > 1 && Number(this.consultationPrice) < 30) || Number(this.consultationPrice) > 350) {
         this.errorConsultationPrice = 'Digite um valor entre 30,00 e 350,00';
       } else {
@@ -171,20 +172,6 @@ export default {
   },
   mounted() {
     this.getSpecialty();
-    
-    if (localStorage.getItem('Data')) {
-			const saveInfos = JSON.parse(localStorage.getItem('Data'));
-			this.selectedMainSpecialty = saveInfos.mainSpecialty;
-      console.log(saveInfos.consultationPrice);
-			this.consultationPrice = parseFloat(saveInfos.consultationPrice.replace('R$ ', '').replace(',', '.'));
-      console.log(this.consultationPrice);
-		}
-  },
-  beforeUpdate() {
-    if (localStorage.getItem('Data')) {
-      const saveInfos = JSON.parse(localStorage.getItem('Data'));
-      this.consultationPrice = parseFloat(saveInfos.consultationPrice.replace('R$ ', '').replace(',', '.'));
-    }
   },
   methods: {
     ...mapActions(['saveFormInfos']),
@@ -211,10 +198,12 @@ export default {
     validateConsultationPrice() {
       if (!this.consultationPrice.toString().length > 1 || Number(this.consultationPrice) < 30 || Number(this.consultationPrice) > 350) {
         this.errorConsultationPrice = 'Digite um valor entre 30,00 e 350,00';
+        console.log(this.errorConsultationPrice);
         this.errors.push('Digite um valor entre 30,00 e 350,00');
       } else {
         if (this.consultationPrice.toString().includes('R$')) {
           this.errorConsultationPrice = '';
+          console.log(this.errorConsultationPrice);
           return this.consultationPrice = this.consultationPrice.toString().replace('.', ',');
         }
         this.consultationPrice = `R$ ${this.consultationPrice.toString().replace('.', ',')}`;
@@ -235,8 +224,8 @@ export default {
         this.selectedPaymentMethods.push('Dinheiro');
       } else {
         this.selectedPaymentMethods = this.selectedPaymentMethods.filter(
-          (item) => item !== 'Dinheiro'
-        )
+          item => item !== 'Dinheiro'
+        );
       }
     },
     checkboxPix({ target }) {
@@ -245,14 +234,18 @@ export default {
         this.selectedPaymentMethods.push('Pix');
       } else {
         this.selectedPaymentMethods = this.selectedPaymentMethods.filter(
-          (item) => item !== 'Pix'
-        )
+          item => item !== 'Pix'
+        );
       }
     },
     checkBoxCard({ target }) {
       const findCard = this.selectedPaymentMethods.find(item => item === 'Card');
       if (target.checked && !findCard) {
         this.selectedPaymentMethods.push('Card');
+      } else {
+        this.selectedPaymentMethods = this.selectedPaymentMethods.filter(
+          item => item !== 'Card'
+        );
       }
     },
     radioInputInstallmentOption() {
@@ -266,7 +259,7 @@ export default {
         this.errorSelectedPaymentMethods = 'Selecione uma forma de pagamento';
         this.errors.push('Selecione uma forma de pagamento');
       } else {
-        this.errorConsultationPrice = '';
+        this.errorSelectedPaymentMethods = '';
       }
     },
     checkFormIsValid() {
