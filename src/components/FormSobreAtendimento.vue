@@ -162,7 +162,6 @@ export default {
   },
   watch: {
     consultationPrice: function () {
-      console.log(this.errorConsultationPrice);
       if ((this.consultationPrice.toString().length > 1 && Number(this.consultationPrice) < 30) || Number(this.consultationPrice) > 350) {
         this.errorConsultationPrice = 'Digite um valor entre 30,00 e 350,00';
       } else {
@@ -198,12 +197,10 @@ export default {
     validateConsultationPrice() {
       if (!this.consultationPrice.toString().length > 1 || Number(this.consultationPrice) < 30 || Number(this.consultationPrice) > 350) {
         this.errorConsultationPrice = 'Digite um valor entre 30,00 e 350,00';
-        console.log(this.errorConsultationPrice);
         this.errors.push('Digite um valor entre 30,00 e 350,00');
       } else {
         if (this.consultationPrice.toString().includes('R$')) {
           this.errorConsultationPrice = '';
-          console.log(this.errorConsultationPrice);
           return this.consultationPrice = this.consultationPrice.toString().replace('.', ',');
         }
         this.consultationPrice = `R$ ${this.consultationPrice.toString().replace('.', ',')}`;
