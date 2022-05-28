@@ -171,20 +171,6 @@ export default {
   },
   mounted() {
     this.getSpecialty();
-    
-    if (localStorage.getItem('Data')) {
-			const saveInfos = JSON.parse(localStorage.getItem('Data'));
-			this.selectedMainSpecialty = saveInfos.mainSpecialty;
-      console.log(saveInfos.consultationPrice);
-			this.consultationPrice = parseFloat(saveInfos.consultationPrice.replace('R$ ', '').replace(',', '.'));
-      console.log(this.consultationPrice);
-		}
-  },
-  beforeUpdate() {
-    if (localStorage.getItem('Data')) {
-      const saveInfos = JSON.parse(localStorage.getItem('Data'));
-      this.consultationPrice = parseFloat(saveInfos.consultationPrice.replace('R$ ', '').replace(',', '.'));
-    }
   },
   methods: {
     ...mapActions(['saveFormInfos']),
@@ -235,8 +221,8 @@ export default {
         this.selectedPaymentMethods.push('Dinheiro');
       } else {
         this.selectedPaymentMethods = this.selectedPaymentMethods.filter(
-          (item) => item !== 'Dinheiro'
-        )
+          item => item !== 'Dinheiro'
+        );
       }
     },
     checkboxPix({ target }) {
@@ -245,14 +231,18 @@ export default {
         this.selectedPaymentMethods.push('Pix');
       } else {
         this.selectedPaymentMethods = this.selectedPaymentMethods.filter(
-          (item) => item !== 'Pix'
-        )
+          item => item !== 'Pix'
+        );
       }
     },
     checkBoxCard({ target }) {
       const findCard = this.selectedPaymentMethods.find(item => item === 'Card');
       if (target.checked && !findCard) {
         this.selectedPaymentMethods.push('Card');
+      } else {
+        this.selectedPaymentMethods = this.selectedPaymentMethods.filter(
+          item => item !== 'Card'
+        );
       }
     },
     radioInputInstallmentOption() {
@@ -266,7 +256,7 @@ export default {
         this.errorSelectedPaymentMethods = 'Selecione uma forma de pagamento';
         this.errors.push('Selecione uma forma de pagamento');
       } else {
-        this.errorConsultationPrice = '';
+        this.errorSelectedPaymentMethods = '';
       }
     },
     checkFormIsValid() {
